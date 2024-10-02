@@ -8,7 +8,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EthereumViewModel @Inject constructor(
-    private val ethereum: Ethereum
+    private val ethereum: Ethereum,
+    private val logger: Logger = DefaultLogger
     ): ViewModel() {
 
     val ethereumState = MediatorLiveData<EthereumState>().apply {
@@ -21,11 +22,11 @@ class EthereumViewModel @Inject constructor(
         ethereum.connect() { result ->
             when (result) {
                 is Result.Error -> {
-                    Logger.log("Ethereum connection error: ${result.error.message}")
+                    logger.log("Ethereum connection error: ${result.error.message}")
                     onError(result.error.message)
                 }
-                is Result.Success.Item -> {
-                    Logger.log("Ethereum connection result: ${result.value}")
+                is Result.Success.Items -> {
+                    logger.log("Ethereum connection result: ${result.value.first()}")
                     onSuccess()
                 }
                 else -> { }
@@ -37,11 +38,11 @@ class EthereumViewModel @Inject constructor(
         ethereum.connectWith(request) { result ->
             when (result) {
                 is Result.Error -> {
-                    Logger.log("Connectwith error: ${result.error.message}")
+                    logger.log("Connectwith error: ${result.error.message}")
                     onError(result.error.message)
                 }
                 is Result.Success.Item -> {
-                    Logger.log("Connectwith result: $result")
+                    logger.log("Connectwith result: $result")
                     onSuccess(result.value)
                 }
                 else -> {}
@@ -49,7 +50,7 @@ class EthereumViewModel @Inject constructor(
         }
     }
 
-    fun connectWithSendTransaction(amount: String,
+    fun connectWithSendTransaction(value: String,
                         from: String,
                         to: String,
                         onSuccess: (Any?) -> Unit,
@@ -57,7 +58,7 @@ class EthereumViewModel @Inject constructor(
         val params: MutableMap<String, Any> = mutableMapOf(
             "from" to from,
             "to" to to,
-            "amount" to amount
+            "value" to value
         )
 
         val transactionRequest = EthereumRequest(
@@ -72,11 +73,11 @@ class EthereumViewModel @Inject constructor(
         ethereum.connectSign(message) { result ->
             when (result) {
                 is Result.Error -> {
-                    Logger.log("Connect & sign error: ${result.error.message}")
+                    logger.log("Connect & sign error: ${result.error.message}")
                     onError(result.error.message)
                 }
                 is Result.Success.Item -> {
-                    Logger.log("Connect & sign  result: $result")
+                    logger.log("Connect & sign  result: $result")
                     onSuccess(result.value)
                 }
                 else -> {}
@@ -110,11 +111,11 @@ class EthereumViewModel @Inject constructor(
         ethereum.sendRequestBatch(requestBatch) { result ->
             when (result) {
                 is Result.Error -> {
-                    Logger.log("Ethereum batch sign error: ${result.error.message}")
+                    logger.log("Ethereum batch sign error: ${result.error.message}")
                     onError(result.error.message)
                 }
                 is Result.Success.Items -> {
-                    Logger.log("Ethereum batch sign result: $result")
+                    logger.log("Ethereum batch sign result: $result")
                     onSuccess(result.value)
                 }
                 else -> {}
@@ -138,11 +139,11 @@ class EthereumViewModel @Inject constructor(
         ethereum.sendRequest(signRequest) { result ->
             when (result) {
                 is Result.Error -> {
-                    Logger.log("Ethereum sign error: ${result.error.message}")
+                    logger.log("Ethereum sign error: ${result.error.message}")
                     onError(result.error.message)
                 }
                 is Result.Success.Item -> {
-                    Logger.log("Ethereum sign result: $result")
+                    logger.log("Ethereum sign result: $result")
                     onSuccess(result.value)
                 }
                 else -> {}
@@ -165,11 +166,11 @@ class EthereumViewModel @Inject constructor(
         ethereum.sendRequest(getBalanceRequest) { result ->
             when (result) {
                 is Result.Error -> {
-                    Logger.log("Ethereum get balance error: ${result.error.message}")
+                    logger.log("Ethereum get balance error: ${result.error.message}")
                     onError(result.error.message)
                 }
                 is Result.Success.Item -> {
-                    Logger.log("Ethereum get balance result: $result")
+                    logger.log("Ethereum get balance result: $result")
                     onSuccess(result.value)
                 }
                 else -> {}
@@ -191,11 +192,11 @@ class EthereumViewModel @Inject constructor(
         ethereum.sendRequest(gasPriceRequest) { result ->
             when (result) {
                 is Result.Error -> {
-                    Logger.log("Ethereum gas price error: ${result.error.message}")
+                    logger.log("Ethereum gas price error: ${result.error.message}")
                     onError(result.error.message)
                 }
                 is Result.Success.Item -> {
-                    Logger.log("Ethereum gas price result: $result")
+                    logger.log("Ethereum gas price result: $result")
                     onSuccess(result.value)
                 }
                 else -> {}
@@ -217,11 +218,11 @@ class EthereumViewModel @Inject constructor(
         ethereum.sendRequest(web3ClientVersionRequest) { result ->
             when (result) {
                 is Result.Error -> {
-                    Logger.log("Ethereum web3 client version error: ${result.error.message}")
+                    logger.log("Ethereum web3 client version error: ${result.error.message}")
                     onError(result.error.message)
                 }
                 is Result.Success.Item -> {
-                    Logger.log("Ethereum web3 client version result: $result")
+                    logger.log("Ethereum web3 client version result: $result")
                     onSuccess(result.value)
                 }
                 else -> {}
@@ -230,7 +231,7 @@ class EthereumViewModel @Inject constructor(
     }
 
     fun sendTransaction(
-        amount: String,
+        value: String,
         from: String,
         to: String,
         onSuccess: (String) -> Unit,
@@ -239,7 +240,7 @@ class EthereumViewModel @Inject constructor(
         val params: MutableMap<String, Any> = mutableMapOf(
             "from" to from,
             "to" to to,
-            "amount" to amount
+            "value" to value
         )
 
         val transactionRequest = EthereumRequest(
@@ -250,11 +251,11 @@ class EthereumViewModel @Inject constructor(
         ethereum.sendRequest(transactionRequest) { result ->
             when (result) {
                 is Result.Error -> {
-                    Logger.log("Ethereum transaction error: ${result.error.message}")
+                    logger.log("Ethereum transaction error: ${result.error.message}")
                     onError(result.error.message)
                 }
                 is Result.Success.Item -> {
-                    Logger.log("Ethereum transaction result: $result")
+                    logger.log("Ethereum transaction result: $result")
                     onSuccess(result.value)
                 }
                 else -> {}
@@ -307,7 +308,7 @@ class EthereumViewModel @Inject constructor(
         onSuccess: (message: String) -> Unit,
         onError: (message: String) -> Unit
     ) {
-        Logger.log("Adding chainId: $chainId")
+        logger.log("Adding chainId: $chainId")
 
         val addChainParams: Map<String, Any> = mapOf(
             "chainId" to chainId,

@@ -15,7 +15,7 @@ android {
         targetSdk 33
 
         ext.versionCode = 1
-        ext.versionName = "0.5.0"
+        ext.versionName = "0.6.6"
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'consumer-rules.pro'
@@ -53,16 +53,21 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.test.ext:junit-ktx:1.1.5'
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"
+
     testImplementation 'junit:junit:4.13.2'
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.7.0"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    testImplementation 'org.robolectric:robolectric:4.10.3'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:4.0.0'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0'
+
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
 
 ext {
     PUBLISH_GROUP_ID = 'io.metamask.androidsdk'
-    PUBLISH_VERSION = '0.5.0'
+    PUBLISH_VERSION = '0.6.6'
     PUBLISH_ARTIFACT_ID = 'metamask-android-sdk'
 }
 

@@ -2,7 +2,7 @@ package io.metamask.androidsdk
 
 import org.json.JSONObject
 
-open class InfuraProvider(private val infuraAPIKey: String?, readonlyRPCMap: Map<String, String>?, private val logger: Logger = DefaultLogger) {
+open class ReadOnlyRPCProvider(private val infuraAPIKey: String?, private val readonlyRPCMap: Map<String, String>?, private val logger: Logger = DefaultLogger) {
     val rpcUrls: Map<String, String> = when {
         readonlyRPCMap != null && infuraAPIKey != null -> {
             // Merge infuraReadonlyRPCMap with readonlyRPCMap, overriding infura's keys if they are present in readonlyRPCMap
@@ -16,7 +16,9 @@ open class InfuraProvider(private val infuraAPIKey: String?, readonlyRPCMap: Map
     }
 
     fun supportsChain(chainId: String): Boolean {
-        return !rpcUrls[chainId].isNullOrEmpty()
+        val apiKey = infuraAPIKey ?: ""
+        val readonlyMap = readonlyRPCMap ?: mapOf()
+        return !rpcUrls[chainId].isNullOrEmpty() && (readonlyMap.containsKey(chainId) || apiKey.isNotEmpty())
     }
 
     fun infuraReadonlyRPCMap(infuraAPIKey: String) : Map<String, String> {
@@ -99,7 +101,13 @@ open class InfuraProvider(private val infuraAPIKey: String?, readonlyRPCMap: Map
         params["id"] = request.id
         params["params"] = request.params ?: listOf<String>()
 
-        httpClient.newCall("${rpcUrls[chainId]}", parameters = params) { response, ioException ->
+        val endpoint = rpcUrls[chainId]
+        if (endpoint == null) {
+            callback?.invoke(Result.Error(RequestError(-1, "There is no defined network for chainId $chainId, please provide it via readonlyRPCMap")))
+            return
+        }
+
+        httpClient.newCall(endpoint, parameters = params) { response, ioException ->
             if (response != null) {
                 logger.log("InfuraProvider:: response $response")
                 try {
